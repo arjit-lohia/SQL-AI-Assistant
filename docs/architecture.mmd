@@ -1,0 +1,34 @@
+flowchart TB
+  Browser[React / TypeScript browser workspace]
+  Local[(Browser-local conversations and theme)]
+  API[FastAPI: request bounds / server-only model configuration / SSE]
+  Graph[Compiled LangGraph StateGraph]
+  Intent[detect_intent]
+  Scope[validate_scope]
+  Schema[retrieve_schema]
+  Generate[generate_sql]
+  Validate[validate_sql: AST / schema / FK / compile]
+  Repair[repair_sql: maximum one attempt]
+  Optimize[optimize_sql: proven rewrite / EXPLAIN]
+  Execute[execute_sql: guarded read-only SQLite]
+  Explain[explain_sql: accepted SQL only]
+  LLM[Groq LLM or labeled sample planner]
+  DB[(Bundled immutable sample.db)]
+  Browser <--> Local
+  Browser <--> API
+  API --> Graph
+  Graph --> Intent --> Scope
+  Scope -->|accepted| Schema --> Generate --> Validate
+  Scope -->|refused| Explain
+  Generate <--> LLM
+  Validate -->|invalid, first failure| Repair --> Validate
+  Repair -->|refused / clarification / error| Explain
+  Validate -->|accepted| Optimize
+  Validate -->|invalid, repair exhausted| Explain
+  Optimize -->|auto-run| Execute --> Explain
+  Optimize -->|generate only| Explain
+  Schema --> DB
+  Validate --> DB
+  Optimize --> DB
+  Execute --> DB
+  Explain --> API

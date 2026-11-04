@@ -1,0 +1,15 @@
+{
+  "file": "queryatlas-demo.webm",
+  "duration_seconds": 206.68,
+  "duration_display": "3:26.68",
+  "width": 1440,
+  "height": 1000,
+  "frames_per_second": 25,
+  "codec": "VP9",
+  "container": "WebM",
+  "size_bytes": 26190454,
+  "provider_mode": "keyless sample",
+  "data_source": "actual local SQLite database",
+  "presentation": "actual screen recording with explanatory captions, no narration",
+  "verification": "FFmpeg media metadata inspected; representative frame visually reviewed"
+}

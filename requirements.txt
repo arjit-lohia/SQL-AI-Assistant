@@ -1,0 +1,2 @@
+# Install the exact dependency versions exercised by the test suite.
+-r requirements.lock

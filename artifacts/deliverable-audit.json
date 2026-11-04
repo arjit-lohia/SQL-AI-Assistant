@@ -1,0 +1,88 @@
+{
+  "status": "passed",
+  "deliverables": {
+    "complete_source": {
+      "status": "present",
+      "artifacts": [
+        "src/App.tsx",
+        "src/lib.ts",
+        "api/index.py",
+        "backend/agent.py",
+        "backend/provider.py",
+        "backend/sql.py",
+        "backend/database.py",
+        "backend/models.py",
+        "scripts/seed.py",
+        "tests/test_sql.py",
+        "tests/test_agent_api.py",
+        "tests/browser/app.spec.ts",
+        "package-lock.json",
+        "requirements.lock"
+      ]
+    },
+    "setup_readme": {
+      "status": "present",
+      "artifacts": [
+        "README.md",
+        ".env.example"
+      ]
+    },
+    "architecture": {
+      "status": "present",
+      "artifacts": [
+        "docs/architecture.svg",
+        "docs/architecture.mmd",
+        "docs/architecture.md"
+      ]
+    },
+    "workflow": {
+      "status": "present",
+      "artifacts": [
+        "docs/workflow.md",
+        "specs/08-agent-and-prompts.md"
+      ]
+    },
+    "runtime_prompts": {
+      "status": "present",
+      "artifacts": [
+        "prompts/system.txt",
+        "prompts/repair.txt"
+      ]
+    },
+    "sample_schema": {
+      "status": "present",
+      "artifacts": [
+        "data/schema.sql",
+        "data/sample.db",
+        "docs/database.md",
+        "scripts/seed.py"
+      ]
+    }
+  },
+  "markdown_documents": 30,
+  "valid_local_links": 141,
+  "diagram": "valid SVG and Mermaid source",
+  "langgraph_nodes": [
+    "detect_intent",
+    "execute_sql",
+    "explain_sql",
+    "generate_sql",
+    "optimize_sql",
+    "repair_sql",
+    "retrieve_schema",
+    "validate_scope",
+    "validate_sql"
+  ],
+  "runtime_prompts": "source files loaded by provider",
+  "schema_tables": [
+    "customers",
+    "departments",
+    "employees",
+    "order_items",
+    "orders",
+    "products"
+  ],
+  "foreign_keys": 5,
+  "rows": 1426,
+  "database_integrity": "ok"
+}
