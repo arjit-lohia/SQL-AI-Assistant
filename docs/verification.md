@@ -7,7 +7,7 @@ Environment: Windows, Python 3.12.4, Node 20.17.0. Date: 2026-11-05 (user's Asia
 | Requirements review | Product requirements and detailed specification set reviewed; approved amendments incorporated |
 | Spec-first | Initial four contracts completed before application code; detailed review paused implementation and expanded to 17 numbered files plus index |
 | Database seed | Built 6 tables / 1,426 records; integrity and FK checks passed |
-| Backend / security / graph / API | `python -m pytest -q`: **95 passing tests** after environment-only model/settings update |
+| Backend / security / graph / API | `python -m pytest -q`: **97 passing tests** after the deployment-manifest fix |
 | Production frontend | `npm run build`: TypeScript + Vite build passed |
 | Browser acceptance | `npm run test:e2e`: **15 tests passed**; actual isolated local API/database used |
 | Screenshots | Desktop/mobile captures generated and visually reviewed |
@@ -38,3 +38,5 @@ Deliverable amendment A07: all six local deliverables are present and linked in 
 Public Vercel behavior and arbitrary live-model accuracy remain outside local verification until publication/key configuration is authorized.
 
 Theme/deployment amendment A08: the switch has no visible text and retains its accessible name, checked state, keyboard operation and persisted theme. Light colors are unchanged; dark mode uses neutral slate surfaces, muted teal actions and theme-appropriate syntax/status/dialog styling. All 15 browser tests passed, including measured contrast of at least 4.5:1 for explanatory text, SQL keywords/strings, the enabled primary action, plan-cost badge and refusal badge. Dark welcome/query/plan/schema screenshots were captured with finite animations settled and visually reviewed. Vercel configuration was reviewed against current official guidance; a project-specific guide was added without account actions or publication. The earlier recorded demo predates this cosmetic theme revision; current screenshots show the new appearance.
+
+Deployment-manifest amendment A09: the reported remote frontend build succeeded, then Python parsing failed at the `requirements.lock` include. `requirements.txt` now contains the same 46 exact runtime pins directly. The generator writes identical flat runtime manifests and has import-safe generation helpers; Docker also installs the canonical `requirements.txt`. Two regression tests verify flat parsing, unchanged lock pin sets and generation that cannot recreate the include wrapper. All **97 Python tests passed**, pip's offline installation dry-run accepted the flat manifest with all packages already satisfied, and `pip check` found no broken requirements. The deliverable/link audit passed again. No package versions were changed, no remote push/deployment was performed, and the Vercel build must be retried using the updated commit.

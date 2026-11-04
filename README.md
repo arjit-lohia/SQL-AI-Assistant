@@ -95,7 +95,7 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-Browser tests start an isolated sample-mode API/frontend on port 8001, leaving your local app and `.env` provider configuration untouched. [Verification report](docs/verification.md) records actual outcomes and limits. Dependency closure is pinned in `requirements*.lock`, `package-lock.json`; `scripts/lock_dependencies.py` can regenerate Python locks after an intentional dependency upgrade.
+Browser tests start an isolated sample-mode API/frontend on port 8001, leaving your local app and `.env` provider configuration untouched. [Verification report](docs/verification.md) records actual outcomes and limits. Dependency closure is pinned in `requirements*.lock`, `package-lock.json`. The runtime `requirements.txt` is a self-contained copy of the exact runtime pins for Vercel compatibility; `scripts/lock_dependencies.py` regenerates it together with the Python locks after an intentional dependency upgrade. Keep both runtime files synchronized rather than adding a nested include to `requirements.txt`.
 
 [Actual captioned demo video](artifacts/queryatlas-demo.webm) · [Transcript](artifacts/demo-transcript.md). To record again, start the built app on 8000 and run `npm run demo`. This records real interactions; allow 3–5 minutes. Large recordings are ignored by Git; publish the file separately when an upload destination is authorized.
 

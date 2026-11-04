@@ -66,6 +66,7 @@ If the production URL asks for Vercel login and you want public access, inspect 
 | Symptom | Check |
 | --- | --- |
 | Frontend works, `/api/health` does not | Confirm root directory, Vite preset, checked-in API routes and Python function build/runtime logs |
+| `PYTHON_REQUIREMENTS_PARSE_ERROR` mentioning an included file | Use the current flat `requirements.txt`, commit it with `scripts/lock_dependencies.py`, and redeploy the updated commit. Do not replace it with `-r requirements.lock`; regeneration now synchronizes both flat files. |
 | Database disconnected | Confirm `data/sample.db` was committed and included in the Python function; regenerate locally with `scripts/seed.py` if missing, then redeploy |
 | Always says Sample mode | Set `GROQ_API_KEY` for the environment you actually deployed, then redeploy |
 | Provider rejects the key/model or returns quota errors | Check the server variable names, Groq account/model access and limits; the app returns safe provider errors |
