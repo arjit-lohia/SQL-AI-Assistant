@@ -30,6 +30,8 @@ Support safe SELECT projections, filters, ordering, grouping/HAVING, DISTINCT, a
 
 ## Dialect matrix
 
+Amendment A10 and [specification 18](18-dialects-follow-ups-and-setup.md) restore a compact output selector inside the query workspace. The prior SQLite-only UI amendment is superseded; native execution boundaries below remain unchanged.
+
 | Concern | SQLite | PostgreSQL | MySQL |
 | --- | --- | --- | --- |
 | UI/API key | sqlite | postgres | mysql |

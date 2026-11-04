@@ -34,6 +34,7 @@ All detailed specifications below are COMPLETE as design contracts. Implementati
 | [15-testing-and-evaluation](15-testing-and-evaluation.md) | Detailed unit, integration, adversarial and browser acceptance matrix |
 | [16-local-docker-and-vercel](16-local-docker-and-vercel.md) | Local operation, reproducible builds, Docker and deferred Vercel deployment |
 | [17-deliverables-and-demo](17-deliverables-and-demo.md) | Every deliverable, 3–5 minute recording and honest submission ledger |
+| [18-dialects-follow-ups-and-setup](18-dialects-follow-ups-and-setup.md) | Compact dialect selector, additive follow-up enforcement and concise setup delivery |
 
 ## Change discipline
 

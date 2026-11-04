@@ -1,6 +1,7 @@
 """Explicitly limited keyless examples, never marketed as live model reasoning."""
 import difflib
 import re
+from datetime import datetime
 import sqlglot
 from sqlglot import exp
 from backend.models import ModelOutput
@@ -9,6 +10,35 @@ from backend import database
 
 def candidate(sql, assumptions=None):
     return ModelOutput(status="success", sql=sql, assumptions=assumptions or [], message="Validated SQL is ready.")
+
+
+def date_refinement(text, previous):
+    if not (re.search(r"\b(?:joined|created|hired)\b", text) and re.search(r"\bbefore\b", text)):
+        return None
+    if not previous:
+        return ModelOutput(status="clarification", message="Which records should I refine? Start with a customer or employee query.")
+    tree = sqlglot.parse_one(previous, read="sqlite")
+    tables = list(tree.find_all(exp.Table))
+    if not isinstance(tree, exp.Select) or len(tables) != 1 or tables[0].name not in {"customers", "employees"}:
+        return ModelOutput(status="clarification", message="Does joined refer to customer account creation or employee hire date?")
+    table = tables[0]
+    if re.search(r"\bcustomers?\b", text) and table.name != "customers" or re.search(r"\bemployees?\b", text) and table.name != "employees":
+        return ModelOutput(status="clarification", message="That changes the previous entity. Start a new conversation for the other table.")
+    raw = re.split(r"\bbefore\s+", text, maxsplit=1)[1].strip().rstrip(".!?")
+    raw = re.sub(r"(\d)(?:st|nd|rd|th)\b", r"\1", raw).replace(",", "")
+    boundary = None
+    for fmt in ("%Y-%m-%d", "%d %b %Y", "%d %B %Y", "%b %d %Y", "%B %d %Y"):
+        try:
+            boundary = datetime.strptime(raw, fmt).date().isoformat()
+            break
+        except ValueError:
+            pass
+    if boundary is None:
+        return ModelOutput(status="clarification", message="Please give a valid cutoff date, for example 2024-10-24. Before excludes that date.")
+    field = "created_at" if table.name == "customers" else "hire_date"
+    tree = tree.where(exp.LT(this=exp.column(field, table=table.alias_or_name), expression=exp.Literal.string(boundary)), append=True)
+    meaning = "customer account creation (created_at)" if field == "created_at" else "employee hire date (hire_date)"
+    return candidate(tree.sql(dialect="sqlite"), [f"Joined means {meaning}. Before {boundary} excludes that date; earlier filters are retained."])
 
 
 def sample_answer(message: str, mode: str, previous: str | None):
@@ -42,6 +72,9 @@ def sample_answer(message: str, mode: str, previous: str | None):
         return candidate(sql)
     if re.search(r"\b(best|active|recent|sales|expensive)\b", text) and not ("revenue" in text or "2024" in text):
         return ModelOutput(status="clarification", message="Which metric and time period should define that request? For example: top customers by non-cancelled revenue in 2025.")
+    dated = date_refinement(text, previous)
+    if dated:
+        return dated
     # Narrow refinements compose through an AST rather than replacing prior SQL.
     if previous and (re.match(r"^(only|just|sort|order|limit|instead|now|show (?:only|the (?:first|top)))\b", text)):
         tree = sqlglot.parse_one(previous, read="sqlite")
@@ -64,9 +97,10 @@ def sample_answer(message: str, mode: str, previous: str | None):
         return candidate(tree.sql(dialect="sqlite"))
     if re.match(r"^(only|just|sort|instead)\b", text) and not previous:
         return ModelOutput(status="clarification", message="Which records should I refine? Start with a query such as 'Show all customers'.")
-    if re.fullmatch(r"(?:show|list|find|get)(?: me)?(?: all)? customers(?: (?:in|from) california)?[.!?]?", text):
-        conditions = " WHERE state = 'California'" if "california" in text else ""
-        return candidate("SELECT id, name, email, city, state, created_at FROM customers" + conditions)
+    if re.fullmatch(r"(?:show|list|find|get|give)(?: me)?(?: all)? (?:customers|people)(?: (?:in|from) (?:california|austin))?[.!?]?", text):
+        conditions = " WHERE state = 'California'" if "california" in text else " WHERE city = 'Austin'" if "austin" in text else ""
+        assumptions = ["People means customers in the supplied database."] if "people" in text else []
+        return candidate("SELECT id, name, email, city, state, created_at FROM customers" + conditions, assumptions)
     if "employee" in text and "2024" in text and re.search(r"(?:after|since|on or after) january", text):
         return candidate("SELECT id, name, email, department_id, hire_date, salary FROM employees WHERE hire_date >= '2024-01-01' ORDER BY hire_date", ["This query uses the specified inclusive January 1, 2024 boundary."])
     if "monthly" in text and "revenue" in text and "2025" in text:

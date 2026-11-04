@@ -8,7 +8,7 @@ Current delivery: local implementation. The user explicitly deferred GitHub and 
 | Source | This project directory; publication not performed |
 | GitHub URL | Deferred by user — no remote repository created/pushed |
 | Public deployed URL | Deferred by user — no Vercel deployment performed |
-| Setup | ../README.md |
+| Setup | [README quick start](../README.md) and [complete setup instructions](setup.md) |
 | Demo | ../artifacts/queryatlas-demo.webm — **3:26.68**, actual captioned local recording (ignored large binary) |
 | Transcript | ../artifacts/demo-transcript.md |
 | Schema/seed | ../data/schema.sql, ../scripts/seed.py, ../data/sample.db |

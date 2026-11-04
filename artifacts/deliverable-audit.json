@@ -8,6 +8,7 @@
         "src/lib.ts",
         "api/index.py",
         "backend/agent.py",
+        "backend/context.py",
         "backend/provider.py",
         "backend/sql.py",
         "backend/database.py",
@@ -15,6 +16,7 @@
         "scripts/seed.py",
         "tests/test_sql.py",
         "tests/test_agent_api.py",
+        "tests/test_conversation.py",
         "tests/browser/app.spec.ts",
         "package-lock.json",
         "requirements.lock"
@@ -24,6 +26,7 @@
       "status": "present",
       "artifacts": [
         "README.md",
+        "docs/setup.md",
         ".env.example"
       ]
     },
@@ -59,8 +62,8 @@
       ]
     }
   },
-  "markdown_documents": 30,
-  "valid_local_links": 141,
+  "markdown_documents": 32,
+  "valid_local_links": 146,
   "diagram": "valid SVG and Mermaid source",
   "langgraph_nodes": [
     "detect_intent",

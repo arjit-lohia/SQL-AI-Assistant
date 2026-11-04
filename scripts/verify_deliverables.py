@@ -9,8 +9,8 @@ import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
 GROUPS = {
-    "complete_source": ["src/App.tsx", "src/lib.ts", "api/index.py", "backend/agent.py", "backend/provider.py", "backend/sql.py", "backend/database.py", "backend/models.py", "scripts/seed.py", "tests/test_sql.py", "tests/test_agent_api.py", "tests/browser/app.spec.ts", "package-lock.json", "requirements.lock"],
-    "setup_readme": ["README.md", ".env.example"],
+    "complete_source": ["src/App.tsx", "src/lib.ts", "api/index.py", "backend/agent.py", "backend/context.py", "backend/provider.py", "backend/sql.py", "backend/database.py", "backend/models.py", "scripts/seed.py", "tests/test_sql.py", "tests/test_agent_api.py", "tests/test_conversation.py", "tests/browser/app.spec.ts", "package-lock.json", "requirements.lock"],
+    "setup_readme": ["README.md", "docs/setup.md", ".env.example"],
     "architecture": ["docs/architecture.svg", "docs/architecture.mmd", "docs/architecture.md"],
     "workflow": ["docs/workflow.md", "specs/08-agent-and-prompts.md"],
     "runtime_prompts": ["prompts/system.txt", "prompts/repair.txt"],

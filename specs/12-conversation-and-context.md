@@ -10,6 +10,8 @@ New conversation creates a distinct empty history. Switching history restores th
 
 ## Follow-up semantics
 
+[Specification 18](18-dialects-follow-ups-and-setup.md) adds the Austin/account-creation cutoff example, all-dialect refinements and conservative independent preservation checks for simple single-table filters under amendment A10.
+
 Determine the most recent validated successful SQL in the active conversation, ignoring refusal/error/clarification turns and in-progress candidates. Revalidate any SQL from the browser before use. The user's latest request refines that SQL unless it explicitly starts a different query.
 
 | Prior query | Follow-up | Expected behavior |

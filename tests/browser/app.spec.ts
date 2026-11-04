@@ -95,6 +95,52 @@ test("schema, theme, history, debugging and refusal", async ({ page }) => {
   await expect(page.getByLabel("Validated SQL")).toContainText("STRFTIME");
 });
 
+test("dialect changes preserve Austin and date follow-ups, exports and history", async ({ page }) => {
+  await page.goto("/");
+  const dialect = page.getByRole("combobox", { name: "SQL dialect", exact: true });
+  await expect(dialect).toHaveValue("sqlite");
+  await send(page, "Give all people from Austin");
+  await expect(page.getByLabel("Validated SQL")).toContainText("Austin");
+  await dialect.selectOption("postgres");
+  await expect(page.locator(".sql-toolbar")).toContainText("SQLite");
+  await send(page, "Show people who joined before 24th Oct, 2024");
+  await expect(page.getByLabel("Validated SQL")).toContainText("Austin");
+  await expect(page.getByLabel("Validated SQL")).toContainText("2024-10-24");
+  await expect(page.locator(".sql-toolbar")).toContainText("PostgreSQL");
+  await dialect.selectOption("mysql");
+  await send(page, "Sort by name");
+  await expect(page.getByLabel("Validated SQL")).toContainText("Austin");
+  await expect(page.getByLabel("Validated SQL")).toContainText("2024-10-24");
+  await expect(page.getByLabel("Validated SQL")).toContainText("ORDER BY");
+  const download = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Download SQL", exact: true }).click();
+  expect(await readFile((await (await download).path())!, "utf8")).toContain("-- MySQL output");
+  await page.reload();
+  await expect(page.locator(".sql-toolbar")).toContainText("MySQL");
+  await expect(page.getByLabel("Validated SQL")).toContainText("Austin");
+  await page.getByRole("button", { name: /New conversation/ }).click();
+  await send(page, "Show people who joined before 24th Oct, 2024");
+  await expect(page.getByLabel("Validated SQL")).toHaveCount(0);
+  await expect(page.getByRole("region", { name: "SQL conversation" }).getByText("Which records should I refine?", { exact: false })).toBeVisible();
+});
+
+test("monthly date functions render in the selected dialect without losing refinements", async ({ page }) => {
+  await page.goto("/");
+  const dialect = page.getByLabel("SQL dialect", { exact: true });
+  await send(page, "Monthly revenue for 2025");
+  await expect(page.getByLabel("Validated SQL")).toContainText("STRFTIME");
+  await dialect.selectOption("postgres");
+  await send(page, "Only completed orders");
+  await expect(page.getByLabel("Validated SQL")).toContainText("TO_CHAR");
+  await expect(page.getByLabel("Validated SQL")).toContainText("2025-01-01");
+  await dialect.selectOption("mysql");
+  await send(page, "Only the first 2");
+  await expect(page.getByLabel("Validated SQL")).toContainText("DATE_FORMAT");
+  await expect(page.getByLabel("Validated SQL")).toContainText("completed");
+  await expect(page.getByLabel("Validated SQL")).toContainText("LIMIT 2");
+  await expect(page.locator(".engine-note")).toContainText("SQLite");
+});
+
 test("history can be cleared from the sidebar without a settings page", async ({
   page,
 }) => {

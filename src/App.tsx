@@ -221,7 +221,7 @@ export default function App() {
   const [active, setActive] = useState(() => conversations[0]?.id || uid());
   const [selected, setSelected] = useState<string | null>(null);
   const [input, setInput] = useState("");
-  const dialect: Dialect = "sqlite";
+  const [dialect, setDialect] = useState<Dialect>("sqlite");
   const [mode, setMode] = useState<"generate" | "optimize" | "debug">(
     "generate",
   );
@@ -880,16 +880,24 @@ export default function App() {
                   <FileCode2 size={16} />
                   Query workspace
                 </span>
-                <span className="muted small">
-                  {response?.sql
-                    ? dialectNames[response.dialect]
-                    : dialectNames[dialect]}
-                </span>
+                <select
+                  className="dialect-select"
+                  aria-label="SQL dialect"
+                  title="Output dialect for your next request; execution uses SQLite"
+                  value={dialect}
+                  disabled={waiting}
+                  onChange={(e) => setDialect(e.target.value as Dialect)}
+                >
+                  <option value="sqlite">SQLite</option>
+                  <option value="postgres">PostgreSQL</option>
+                  <option value="mysql">MySQL</option>
+                </select>
               </div>
               <div className="sql-toolbar">
                 <div>
                   <span className="file-dot" />
                   <strong>query.sql</strong>
+                  {response?.sql && <span className="muted small">{dialectNames[response.dialect]}</span>}
                   {response?.validation.valid && (
                     <span className="validation-badge">
                       <Check size={12} />

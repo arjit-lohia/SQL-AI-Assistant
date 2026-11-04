@@ -8,7 +8,7 @@
 | validate_scope | Blocks recognized unrelated requests, destructive/injected instructions and parsed writes. With live AI, unfamiliar business wording is passed to the schema-constrained model for semantic refusal/clarification instead of requiring an exact keyword match. Refusal routes straight to explain_sql. |
 | retrieve_schema | Introspects actual bundled tables/FKs/indexes; revalidates latest assistant SQL in its original dialect and converts it to canonical SQLite. Bad context terminates safely. |
 | generate_sql | Live structured Groq proposal or explicitly labeled deterministic sample planner. Diagnoses pasted SQL first. Valid optimize/debug input is retained for deterministic optimization, avoiding unproven model rewrites. |
-| validate_sql | SQLGlot AST/scoped schema/FK/function checks and guarded SQLite compilation. Success → optimize_sql; initial live-model failure → repair_sql; subsequent failure → explain_sql with no SQL. |
+| validate_sql | SQLGlot AST/scoped schema/FK/function checks and guarded SQLite compilation, plus a check for lost filters in additive single-table refinements. Success → optimize_sql; initial live-model failure → repair_sql; subsequent failure → explain_sql with no SQL. |
 | repair_sql | One additional strict model proposal with safe validation diagnostics. Success proposal returns to validate_sql; refusal/clarification/provider error terminates. |
 | optimize_sql | Formatting, narrowly proven unused LEFT JOIN removal, revalidation, index advice and actual EXPLAIN QUERY PLAN. |
 | execute_sql | Optional when auto-run enabled; guarded immutable SQLite, deadline/instruction budget, 500-row cap. |
@@ -33,3 +33,9 @@ The typed `State` carries the validated `ChatRequest`, intent, trusted schema, r
 The generation branch accepts a strict success/refusal/clarification model object. Refusal and clarification terminate without SQL. SQL validation failure can trigger one repair when a live provider is configured; another failure terminates safely. The optimizer only applies a proven redundant-LEFT-JOIN rewrite and revalidates it. Execution is a separate optional node and a separately validating endpoint. The explanation is derived from the final accepted SQL, avoiding stale model explanations after optimization.
 
 Related design contracts: [agent/prompt specification](../specs/08-agent-and-prompts.md), [API model](../specs/03-api.md), [validation/guardrails](../specs/10-sql-validation-and-guardrails.md) and [context](../specs/12-conversation-and-context.md).
+
+## Dialects and follow-ups
+
+The workspace selector chooses SQLite, PostgreSQL or MySQL syntax for the next request. Previous SQL is always validated in its original dialect and canonicalized to SQLite before refining. Existing responses/downloads keep their own dialect; actual execution and costs remain SQLite-based.
+
+After customers from Austin, a joined-before refinement adds an account-creation cutoff without removing Austin. Sample mode composes this through the AST, with an explicit assumption about what joined means. Live generation receives the same previous SQL even for follow-ups beginning with Show. The [context checker](../backend/context.py) compares top-level WHERE conjuncts for simple single-table additive refinements, normalizing column aliases. Missing conditions trigger the existing bounded repair; repeated failure returns no SQL/results. Explicit replacement/reset, supplied SQL and changes to another table are excluded. This conservative check may reject equivalent predicate rewrites; complex joins/subqueries still rely on model interpretation plus schema validation, not a general semantic proof. See [specification 18](../specs/18-dialects-follow-ups-and-setup.md).

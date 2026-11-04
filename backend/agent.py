@@ -9,6 +9,7 @@ from backend import database, provider
 from backend.models import ChatRequest, ModelOutput
 from backend.sample import sample_answer
 from backend.sql import validate, optimize, explain, InvalidSQL, CHECKS, BLOCKED
+from backend.context import check_preserved_filters
 
 
 class State(TypedDict, total=False):
@@ -50,7 +51,7 @@ def validate_scope(s):
             ast_write = any(n.__class__.__name__ in BLOCKED for tree in sqlglot.parse(s["request"].message) if tree for n in tree.walk())
         except sqlglot.errors.SqlglotError:
             pass
-    known_scope = re.search(r"\b(?:sql|schema|database|table|column|query|queries|customers?|employees?|departments?|products?|orders?|order_items|revenue|hire|salary|state|index|join|select|with)\b", text)
+    known_scope = re.search(r"\b(?:sql|schema|database|table|column|query|queries|customers?|employees?|departments?|products?|orders?|order_items|people|joined|revenue|hire|salary|state|index|join|select|with)\b", text)
     followup = re.match(r"^(only|just|sort|order|limit|instead|now|show (?:only|the))\b", text)
     if ast_write or re.search(injection, text) or re.search(unrelated, text) or (not re.match(r"\s*(select|with)\b", text) and re.search(write, text)) or (not known_scope and not followup and not provider.configured()):
         return {"failure": REFUSAL, "candidate": ModelOutput(status="refused", message=REFUSAL)}
@@ -111,6 +112,8 @@ async def generate_sql(s):
 def validate_sql(s):
     try:
         accepted = validate(s["candidate"].sql or "", s["request"].dialect)
+        request = s["request"]
+        check_preserved_filters(s.get("previous"), accepted.sqlite, request.message, request.mode)
         return {"validated": accepted, "failure": ""}
     except InvalidSQL as exc:
         return {"failure": str(exc), "diagnostics": [*s.get("diagnostics", []), str(exc)]}
